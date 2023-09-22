@@ -8,6 +8,8 @@ sudo apt-get install python3-tk
 pip3 install numpy matplotlib
 ```
 
+######실습
+
 ## 실행
 ```
 python simulation.py
