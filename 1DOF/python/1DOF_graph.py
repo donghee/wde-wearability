@@ -60,14 +60,6 @@ h_d = d_d - q_u - q_f
 baselink_angle = radians(device_baselink_angle)
 
 
-l_s_u = (L_h_u*sin(q_f - d_d + q_u) + L_d_f*sin(q_f) + L_d_u*sin(d_d - q_f))/sin(q_f - d_d + q_u)
-l_s_f = (L_h_f*sin(q_f - d_d + q_u) + L_d_u*sin(q_u) + L_d_f*sin(d_d - q_u))/sin(q_f - d_d + q_u)
-
-h_d = d_d - q_u - q_f
-
-baselink_angle = radians(device_baselink_angle)
-
-
 # initial value of spring length
     
 l_s_u_0 = L_h_u - L_d_u  # initial value of human upper arm spring[m] 
@@ -102,16 +94,16 @@ if(abs(Mf)>10):
 else:
     SMf = (-1/10)*abs(Mf)+1
 
-if(abs(AD)>4):
+if(abs(AD)>5):
     SA = 10**(-10)
 else:
-    SA = (-1/4)*abs(AD)+1
+    SA = (-1/5)*abs(AD)+1
 
 St  = SFu*SMu*SFf*SMf*SA
 if(St<=10**(-10)):
     Stotal = 0
 else:
-    Stotal = 0.1**(10 + np.log(St))
+    Stotal = 0.1*(10 + np.log(St))
 
 x = (L_d_f*cos(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*cos(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*cos(baselink_angle))/sin(q_f - d_d + q_u)
 y = (L_d_f*sin(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*sin(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*sin(baselink_angle))/sin(q_f - d_d + q_u)
@@ -130,7 +122,9 @@ y_h_u = y + L_h_u * sin(baselink_angle + q_u)
 
 
 # print
-
+print('[Interaction force]')
+print('-device elbow angle   : ',str(round(degrees(d_d),4)))
+print('-human elbow angle    : ',str(round(degrees(h_d),4)))
 print('[Interaction force]')
 print('-upperarm(moment)     : ',str(round(Mu,4)))
 print('-upperarm(shear force): ',str(round(Fu,4)))
@@ -142,11 +136,12 @@ print('-upperarm(shear force): ',str(round(SFu,4)))
 print('-forearm(moment)      : ',str(round(SMf,4)))
 print('-forearm(shear force) : ',str(round(SFf,4)))
 print('-angle similarity     : ',str(round(SA,4)))
+print('-Total                : ',str(round(Stotal,4)))
 
 
 # figure 1 - human posture prediction
 
-plt.figure(1)
+plt.title('Posture')
 plt.grid(color='black')
 plt.xlabel('X[m]')
 plt.ylabel('Y[m]')
@@ -160,16 +155,16 @@ plt.plot([x, x_h_f], [y, y_h_f], color='green', linewidth=1)
 plt.plot([x, x_h_u], [y, y_h_u], color='green', linewidth=1)
 plt.plot(x, y, 'g.', markersize=15)
 plt.plot(x_d_f, y_d_f, 'g.', markersize=15)
-plt.text(x_d_f, y_d_f, 'B')
+# plt.text(x_d_f, y_d_f, 'B')
 plt.plot(x_d_u, y_d_u, 'g.', markersize=15)
-plt.text(x_d_u, y_d_u, 'A')
-plt.plot(0, 0, 'black', markersize=15)
+# plt.text(x_d_u, y_d_u, 'A')
+plt.plot(0, 0, 'k.', markersize=15)
 
 
 # figure 2 - interaction force
 
-fig2 = plt.figure(2)
 fig2, ax1 = plt.subplots()
+plt.title('Interaction Force')
 plt.grid(color='black')
 ax1.set_ylabel('moment[Nm]', color = 'red')
 ax1.set_ylim([-10, 10])
@@ -196,7 +191,8 @@ df = pd.DataFrame({
 })
 
 
-fig3 = plt.figure(3)
+# plt.figure(figsize=(15,20))
+fig3 = plt.figure()
 labels = df.columns[1:]
 num_labels = len(labels)
 angles = [x/float(num_labels)*(2*pi) for x in range(num_labels)] ## 각 등분점
@@ -218,7 +214,7 @@ for i, row in df.iterrows():
     ax.plot(angles, data, color=color, linewidth=2, linestyle='solid', label=row.Wearing_offset)
     ax.fill(angles, data, color=color, alpha=0.4)     
 
-for g in ax.yaxis.get_gridlines():
+for g in ax.yaxis.get_gridlines():  
     g.get_path()._interpolation_steps = len(labels)
 
 spine = Spine(axes=ax,
@@ -226,6 +222,7 @@ spine_type='circle',
 path=Path.unit_regular_polygon(len(labels)))
 spine.set_transform(Affine2D().scale(.5).translate(.5, .5)+ax.transAxes)
 ax.spines = {'polar':spine}
+plt.title('Safety', x = 0, y = 1)
 # plt.legend(loc=(0.9,0.9))
 
 plt.show()

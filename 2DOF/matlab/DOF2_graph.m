@@ -8,8 +8,8 @@ G1 = importdata('result.txt');
 
 %% input - 원하는 각도 1도 단위로 입력(고관절, 무릎)
 
-human_hip_angle = 170
-human_knee_angle = 170
+human_hip_angle = 30
+human_knee_angle = 30
 
 %% 상수 73kg, 1741mm 남성
 
@@ -359,10 +359,10 @@ title(sprintf('Result of Device Safety'));
 disp('------------------------------')
 disp('Output Parameter')
 
-disp(sprintf('human hip angle : %d°',q_hh));
-disp(sprintf('human knee angle : %d°',q_hk));
-disp(sprintf('device hip angle : %d°',q_rh));
-disp(sprintf('device knee angle : %d°',q_rk));
+disp(sprintf('human hip angle : %d°',rad2deg(q_hh)));
+disp(sprintf('human knee angle : %d°',rad2deg(q_hk)));
+disp(sprintf('device hip angle : %d°',rad2deg(q_rh)));
+disp(sprintf('device knee angle : %d°',rad2deg(q_rk)));
 
 disp(sprintf('Interaction Force(Mw) : %dNm',Mw));
 disp(sprintf('Interaction Force(Fw) : %dNm',Fw));

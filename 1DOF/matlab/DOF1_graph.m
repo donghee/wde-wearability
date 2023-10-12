@@ -9,7 +9,7 @@ G1 = importdata('result.txt');
 %% input - 원하는 각도 1도 단위로 입력(베이스링크, 팔꿈치)
 
 device_baselink_angle = 0
-device_elbow_angle = 175
+device_elbow_angle = 120
 
 %% 상수 73kg, 1741mm 남성
 
@@ -297,8 +297,8 @@ title(sprintf('Result of Device Safety'));
 disp('------------------------------')
 disp('Output Parameter')
 
-disp(sprintf('device elbow angle : %d°',d_d))
-disp(sprintf('human elbow angle : %d°',h_d))
+disp(sprintf('device elbow angle : %d°',rad2deg(d_d)))
+disp(sprintf('human elbow angle : %d°',rad2deg(h_d)))
 
 disp(sprintf('Interaction Force(M.u.) : %dNm',Mu))
 disp(sprintf('Interaction Force(F.u.) : %dN',Fu))
