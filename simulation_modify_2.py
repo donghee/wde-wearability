@@ -249,3 +249,307 @@ def test_safety(baselink_angle=0, device_angle=175):
     plt.close()
 
 #test_safety(baselink_angle=0, device_angle=175)
+
+from io import BytesIO
+
+def safety_fig(baselink_angle=0, device_angle=175):
+    # 베이스링크 각도 INPUT
+    #a = radians(0) # deg 단위로 원하는 값 넣어주세요. ex) 0 45 90 180
+    #a = radians(45)
+    a = radians(baselink_angle) # deg 단위로 원하는 값 넣어주세요. ex) 0 45 90 180
+    
+    # 디바이스 각도 INPUT
+    #d_d = radians(175)
+    #d_d = radians(135) # deg 단위로 원하는 값 넣어주세요. ex) 0 45 90 180
+    d_d = radians(device_angle)
+    
+    # Newton Raphson Method
+    # 적절한 초기값이 대입되도록 반복
+    i_q_u = 5 # q_u의 초기값
+    i_q_f = 5 # q_f의 초기값
+    tol = 1e-4
+    
+    while True:
+        i = 0
+        X = np.array([radians(i_q_u), radians(i_q_f)])
+        err = max(np.abs(ff_func(X)))
+        errors = []
+    
+        while True:
+            i += 1
+            X1 = X - np.linalg.inv(jj_func(X)).dot(ff_func(X))
+            #X1 = X - np.linalg.solve(jj_func(X), ff_func(X))
+            X = X1
+            err = max(np.abs(ff_func(X)))
+            #print(f'i: {i}, error: {err}')
+            errors.append(err)
+            if err <= tol:
+                break
+    
+        if np.all(np.diff(errors) < 0):
+            print('Did not diverge')
+            break
+        else:
+            print(f'Diverged in {len(errors)} iterations')
+            if i_q_u >= -5:
+                i_q_u = i_q_u - 0.1 
+            else:
+                i_q_f = i_q_f - 0.1
+                i_q_u = 5
+            print(f'i_q_u: {i_q_u}, i_q_f: {i_q_f}')
+    
+    # 계산결과
+    # 최적화를 통해 출력된 각도값
+    q_u, q_f = X
+    
+    # 각도 변수 관계: 인체팔꿈치 각도 = 디바이스팔꿈치 각도 - 상완비틀림각도 - 전완비틀림각도
+    h_d = d_d - q_u - q_f
+    
+    # 상완,전완 접촉부 인장스프링 길이
+    l_s_u = (L_h_u*sin(q_f - d_d + q_u) + L_d_f*sin(q_f) + L_d_u*sin(d_d - q_f))/sin(q_f - d_d + q_u)
+    l_s_f = (L_h_f*sin(q_f - d_d + q_u) + L_d_u*sin(q_u) + L_d_f*sin(d_d - q_u))/sin(q_f - d_d + q_u)
+    
+    # 인체 팔꿈치 좌표값(x,y)
+    x = (L_d_f*cos(a + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*cos(a + q_u) + L_d_u*sin(q_f - d_d + q_u)*cos(a))/sin(q_f - d_d + q_u)
+    y = (L_d_f*sin(a + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*sin(a + q_u) + L_d_u*sin(q_f - d_d + q_u)*sin(a))/sin(q_f - d_d + q_u)
+    
+    # 시각화 - 각 좌표점 위치를 통해 시각화
+    x_d_u = L_d_u * cos(a + 0)
+    y_d_u = L_d_u * sin(a + 0)
+    x_d_f = L_d_f * cos(a + d_d)
+    y_d_f = L_d_f * sin(a + d_d)
+    x_h_f = x + L_h_f * cos(a + q_u + h_d)
+    y_h_f = y + L_h_f * sin(a + q_u + h_d)
+    x_h_u = x + L_h_u * cos(a + q_u)
+    y_h_u = y + L_h_u * sin(a + q_u)
+    
+    plt.figure(figsize=(5, 3))
+    plt.grid(color='black')
+    plt.xlabel('X[m]')
+    plt.ylabel('Y[m]')
+    plt.xticks(np.arange(-0.4, 0.5, 0.1))
+    plt.xlim([-0.4, 0.4])
+    plt.yticks(np.arange(-0.1, 0.5, 0.1))
+    plt.ylim([-0.1, 0.4])
+    plt.plot([0, x_d_f], [0, y_d_f], color='black', linewidth=1)
+    plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
+    plt.plot([x, x_h_f], [y, y_h_f], color='green', linewidth=1)
+    plt.plot([x, x_h_u], [y, y_h_u], color='green', linewidth=1)
+    plt.plot(x, y, 'g.', markersize=15)
+    plt.plot(x_d_f, y_d_f, 'g.', markersize=15)
+    plt.text(x_d_f, y_d_f, 'B')
+    plt.plot(x_d_u, y_d_u, 'g.', markersize=15)
+    plt.text(x_d_u, y_d_u, 'A')
+    plt.plot(0, 0, 'black', markersize=15)
+    #plt.show()
+    
+    # 각도 및 변형량 출력
+    deg_q_u = round(degrees(q_u), 4)
+    deg_q_f = round(degrees(q_f), 4)
+    deg_device = round(degrees(d_d), 4)
+    deg_human = round(degrees(h_d), 4)
+    mm_def_l_s_u = round(1000 * (l_s_u - l_s_u_0), 4)
+    mm_def_l_s_f = round(1000 * (l_s_f - l_s_f_0), 4)
+    print(f'deg_q_u = {deg_q_u}')
+    print(f'deg_q_f = {deg_q_f}')
+    print(f'deg_device = {deg_device}')
+    print(f'deg_human = {deg_human}')
+    print(f'mm_def_l_s_u = {mm_def_l_s_u}')
+    print(f'mm_def_l_s_f = {mm_def_l_s_f}')
+    
+    # 안전성 점수
+    Mu = K_t_u*q_u
+    Mf = K_t_f*q_f
+    Fu = K_u*(l_s_u - l_s_u_0)
+    Ff = K_u*(l_s_f - l_s_f_0)
+    A = degrees(h_d) - degrees(d_d)
+    
+    # 안전성에 대한 정의
+    
+    if(abs(Fu) > 100):
+        SFu = 10**(-10)
+    else:
+        SFu = (-1/100)*abs(Fu)+1
+    
+    if(abs(Mu) > 100):
+        SMu = 10**(-10)
+    else:
+        SMu = (-1/100)*abs(Mu)+1
+    
+    if(abs(Ff) > 100):
+        SFf = 10**(-10)
+    else:
+        SFf = (-1/100)*abs(Ff)+1
+    
+    if(abs(Mf) > 100):
+        SMf = 10**(-10)
+    else:
+        SMf = (-1/100)*abs(Mf)+1
+    
+    # 팔꿈치 각도에 따른 안전성 점수
+    if(degrees(h_d) > 180):
+        Sq = 10**(-10)
+    elif(abs(A) > 4):
+        Sq = 10**(-10)
+    else:
+        Sq = (-1/4)*abs(A)+1
+    
+    # 안전성 종합점수
+    St  = SFu*SMu*SFf*SMf*Sq
+    if(St <= 10**(-10)):
+        Stotal = 0
+    else:
+        Stotal  = 0.1*(10 + np.log(St))
+    
+    safety_Fu = round(SFu,4)
+    safety_Mu = round(SMu,4)
+    safety_Ff = round(SFf,4)
+    safety_Mf = round(SMf,4)
+    safety_Total = round(Stotal,4)
+    
+    print(f'safety_Fu = {safety_Fu}')
+    print(f'safety_Mu = {safety_Mu}')
+    print(f'safety_Ff = {safety_Ff}')
+    print(f'safety_Mf = {safety_Mf}')
+    print(f'safety_Total = {safety_Total}')
+    
+    #plt.show(block=False)
+    #plt.pause(3)
+    #plt.close()
+
+    img = BytesIO()
+    plt.savefig(img, format='png', dpi=200)
+    img.seek(0)
+    return img
+
+def safety(baselink_angle=0, device_angle=175):
+    # 베이스링크 각도 INPUT
+    #a = radians(0) # deg 단위로 원하는 값 넣어주세요. ex) 0 45 90 180
+    #a = radians(45)
+    a = radians(baselink_angle) # deg 단위로 원하는 값 넣어주세요. ex) 0 45 90 180
+    
+    # 디바이스 각도 INPUT
+    #d_d = radians(175)
+    #d_d = radians(135) # deg 단위로 원하는 값 넣어주세요. ex) 0 45 90 180
+    d_d = radians(device_angle)
+    
+    # Newton Raphson Method
+    # 적절한 초기값이 대입되도록 반복
+    i_q_u = 5 # q_u의 초기값
+    i_q_f = 5 # q_f의 초기값
+    tol = 1e-4
+    
+    while True:
+        i = 0
+        X = np.array([radians(i_q_u), radians(i_q_f)])
+        err = max(np.abs(ff_func(X)))
+        errors = []
+    
+        while True:
+            i += 1
+            X1 = X - np.linalg.inv(jj_func(X)).dot(ff_func(X))
+            #X1 = X - np.linalg.solve(jj_func(X), ff_func(X))
+            X = X1
+            err = max(np.abs(ff_func(X)))
+            #print(f'i: {i}, error: {err}')
+            errors.append(err)
+            if err <= tol:
+                break
+    
+        if np.all(np.diff(errors) < 0):
+            print('Did not diverge')
+            break
+        else:
+            print(f'Diverged in {len(errors)} iterations')
+            if i_q_u >= -5:
+                i_q_u = i_q_u - 0.1 
+            else:
+                i_q_f = i_q_f - 0.1
+                i_q_u = 5
+            print(f'i_q_u: {i_q_u}, i_q_f: {i_q_f}')
+    
+    # 계산결과
+    # 최적화를 통해 출력된 각도값
+    q_u, q_f = X
+    
+    # 각도 변수 관계: 인체팔꿈치 각도 = 디바이스팔꿈치 각도 - 상완비틀림각도 - 전완비틀림각도
+    h_d = d_d - q_u - q_f
+    
+    # 상완,전완 접촉부 인장스프링 길이
+    l_s_u = (L_h_u*sin(q_f - d_d + q_u) + L_d_f*sin(q_f) + L_d_u*sin(d_d - q_f))/sin(q_f - d_d + q_u)
+    l_s_f = (L_h_f*sin(q_f - d_d + q_u) + L_d_u*sin(q_u) + L_d_f*sin(d_d - q_u))/sin(q_f - d_d + q_u)
+    
+    # 인체 팔꿈치 좌표값(x,y)
+    x = (L_d_f*cos(a + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*cos(a + q_u) + L_d_u*sin(q_f - d_d + q_u)*cos(a))/sin(q_f - d_d + q_u)
+    y = (L_d_f*sin(a + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*sin(a + q_u) + L_d_u*sin(q_f - d_d + q_u)*sin(a))/sin(q_f - d_d + q_u)
+    
+    # 시각화 - 각 좌표점 위치를 통해 시각화
+    x_d_u = L_d_u * cos(a + 0)
+    y_d_u = L_d_u * sin(a + 0)
+    x_d_f = L_d_f * cos(a + d_d)
+    y_d_f = L_d_f * sin(a + d_d)
+    x_h_f = x + L_h_f * cos(a + q_u + h_d)
+    y_h_f = y + L_h_f * sin(a + q_u + h_d)
+    x_h_u = x + L_h_u * cos(a + q_u)
+    y_h_u = y + L_h_u * sin(a + q_u)
+    
+    # 각도 및 변형량 출력
+    deg_q_u = round(degrees(q_u), 4)
+    deg_q_f = round(degrees(q_f), 4)
+    deg_device = round(degrees(d_d), 4)
+    deg_human = round(degrees(h_d), 4)
+    mm_def_l_s_u = round(1000 * (l_s_u - l_s_u_0), 4)
+    mm_def_l_s_f = round(1000 * (l_s_f - l_s_f_0), 4)
+
+    # 안전성 점수
+    Mu = K_t_u*q_u
+    Mf = K_t_f*q_f
+    Fu = K_u*(l_s_u - l_s_u_0)
+    Ff = K_u*(l_s_f - l_s_f_0)
+    A = degrees(h_d) - degrees(d_d)
+    
+    # 안전성에 대한 정의
+    
+    if(abs(Fu) > 100):
+        SFu = 10**(-10)
+    else:
+        SFu = (-1/100)*abs(Fu)+1
+    
+    if(abs(Mu) > 100):
+        SMu = 10**(-10)
+    else:
+        SMu = (-1/100)*abs(Mu)+1
+    
+    if(abs(Ff) > 100):
+        SFf = 10**(-10)
+    else:
+        SFf = (-1/100)*abs(Ff)+1
+    
+    if(abs(Mf) > 100):
+        SMf = 10**(-10)
+    else:
+        SMf = (-1/100)*abs(Mf)+1
+    
+    # 팔꿈치 각도에 따른 안전성 점수
+    if(degrees(h_d) > 180):
+        Sq = 10**(-10)
+    elif(abs(A) > 4):
+        Sq = 10**(-10)
+    else:
+        Sq = (-1/4)*abs(A)+1
+    
+    # 안전성 종합점수
+    St  = SFu*SMu*SFf*SMf*Sq
+    if(St <= 10**(-10)):
+        Stotal = 0
+    else:
+        Stotal  = 0.1*(10 + np.log(St))
+    
+    safety_Fu = round(SFu,4)
+    safety_Mu = round(SMu,4)
+    safety_Ff = round(SFf,4)
+    safety_Mf = round(SMf,4)
+    safety_Total = round(Stotal,4)
+    
+    return safety_Fu, safety_Mu, safety_Ff, safety_Mf, safety_Total 
+    

@@ -6,10 +6,23 @@
   <div class="col-lg-6 mx-auto">
     <p class="lead mb-4">웨어러블 디바이스의 착용성 평가</p>
   </div>
+  <h4 class="lead fw-bold">입력 파라미터</h4>
+  <div class="mx-auto">
+  <textarea class="w-75" id="wearability-parameter" rows="5">
+{
+   "baselink-angle": 0,
+   "device-angle": 175
+}
+  </textarea>
+  </div>
 </div>
-<div id="btn-more" class="d-grid gap-2 col-3 mx-auto">
-  <button class="btn btn-primary" hx-get="wearability" hx-target="#wearability-result" hx-swap="innerHTML">시작</button>
+<div id="btn-more" class="d-grid gap-2 col-3 mx-auto"> 
+  <button class="btn btn-primary" hx-get="safety" hx-target="#wearability-result" hx-swap="innerHTML"
+    hx-on::after-request="document.getElementById('wearability-result-fig').style.display='block'" hx-indicator="#spinner">시작</button>
+  <img id="spinner" class="htmx-indicator" src="https://htmx.org/img/bars.svg"/>
 </div>
 <div id="wearability-result">
 </div>
+<img id="wearability-result-fig" src="fig/safety" style="display: none"/>
+
 {% endblock %}
