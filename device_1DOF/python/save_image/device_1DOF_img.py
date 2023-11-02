@@ -178,120 +178,120 @@ def case(m):
             Stotal = 0.1*(10 + np.log(St))
 
 
-        # # figure 1
+        # figure 1
 
-        # x = (L_d_f*cos(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*cos(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*cos(baselink_angle))/sin(q_f - d_d + q_u)
-        # y = (L_d_f*sin(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*sin(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*sin(baselink_angle))/sin(q_f - d_d + q_u)
+        x = (L_d_f*cos(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*cos(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*cos(baselink_angle))/sin(q_f - d_d + q_u)
+        y = (L_d_f*sin(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*sin(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*sin(baselink_angle))/sin(q_f - d_d + q_u)
 
-        # x_d_u = L_d_u * cos(baselink_angle + 0) 
-        # y_d_u = L_d_u * sin(baselink_angle + 0) 
+        x_d_u = L_d_u * cos(baselink_angle + 0) 
+        y_d_u = L_d_u * sin(baselink_angle + 0) 
 
-        # x_d_f = L_d_f * cos(baselink_angle + d_d)
-        # y_d_f = L_d_f * sin(baselink_angle + d_d)
+        x_d_f = L_d_f * cos(baselink_angle + d_d)
+        y_d_f = L_d_f * sin(baselink_angle + d_d)
 
-        # x_h_f = x + L_h_f * cos(baselink_angle + q_u + h_d)
-        # y_h_f = y + L_h_f * sin(baselink_angle + q_u + h_d)
+        x_h_f = x + L_h_f * cos(baselink_angle + q_u + h_d)
+        y_h_f = y + L_h_f * sin(baselink_angle + q_u + h_d)
 
-        # x_h_u = x + L_h_u * cos(baselink_angle + q_u)
-        # y_h_u = y + L_h_u * sin(baselink_angle + q_u)
+        x_h_u = x + L_h_u * cos(baselink_angle + q_u)
+        y_h_u = y + L_h_u * sin(baselink_angle + q_u)
 
-        # txt1 = 'device elbow angle : ' + str(round(degrees(d_d),4)) + '°'
-        # txt2 = 'human elbow angle : ' + str(round(degrees(h_d),4)) + '°'
+        txt1 = 'device elbow angle : ' + str(round(degrees(d_d),4)) + '°'
+        txt2 = 'human elbow angle : ' + str(round(degrees(h_d),4)) + '°'
 
-        # plt.title('Posture')
-        # plt.grid(True)
-        # plt.xlabel('X[m]')
-        # plt.ylabel('Y[m]')
-        # plt.xticks(np.arange(-0.5, 0.5, 0.1))
-        # plt.xlim([-0.5, 0.5])
-        # plt.yticks(np.arange(-0.4, 0.4, 0.1))
-        # plt.ylim([-0.4, 0.4])
-        # plt.plot([0, x_d_f], [0, y_d_f], color='black', linewidth=1)
-        # plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
-        # plt.plot([x, x_h_f], [y, y_h_f], color='green', linewidth=1)
-        # plt.plot([x, x_h_u], [y, y_h_u], color='green', linewidth=1)
-        # plt.plot(x, y, 'g.', markersize=15)
-        # plt.plot(x_d_f, y_d_f, 'g.', markersize=15)
-        # plt.plot(x_d_u, y_d_u, 'g.', markersize=15)
-        # plt.plot(0, 0, 'k.', markersize=15)
-        # plt.text(-0.49,-0.34,txt1)
-        # plt.text(-0.49,-0.39,txt2)
-        # plt.savefig(posture)
-        # plt.close()
+        plt.title('Posture')
+        plt.grid(True)
+        plt.xlabel('X[m]')
+        plt.ylabel('Y[m]')
+        plt.xticks(np.arange(-0.5, 0.5, 0.1))
+        plt.xlim([-0.5, 0.5])
+        plt.yticks(np.arange(-0.4, 0.4, 0.1))
+        plt.ylim([-0.4, 0.4])
+        plt.plot([0, x_d_f], [0, y_d_f], color='black', linewidth=1)
+        plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
+        plt.plot([x, x_h_f], [y, y_h_f], color='green', linewidth=1)
+        plt.plot([x, x_h_u], [y, y_h_u], color='green', linewidth=1)
+        plt.plot(x, y, 'g.', markersize=15)
+        plt.plot(x_d_f, y_d_f, 'g.', markersize=15)
+        plt.plot(x_d_u, y_d_u, 'g.', markersize=15)
+        plt.plot(0, 0, 'k.', markersize=15)
+        plt.text(-0.49,-0.34,txt1)
+        plt.text(-0.49,-0.39,txt2)
+        plt.savefig(posture)
+        plt.close()
 
-        # # figure 2
+        # figure 2
 
-        # fig2, ax1 = plt.subplots()
-        # plt.title('Interaction Force')
-        # plt.grid(True)
-        # ax1.set_ylabel('moment[Nm]', color = 'red')
-        # ax1.set_ylim([-maximum_M, maximum_M])
-        # ax2 = ax1.twinx()
-        # ax2.set_ylabel('force[N]', color = 'blue')
-        # ax2.set_ylim([-maximum_F, maximum_F])
-        # x1 = np.arange(4)
-        # X1 = ['Mu', 'Fu', 'Mf', 'Ff']
-        # Y1 = [Mu, Fu, Mf, Ff]
-        # C1 = ['red', 'blue', 'red', 'blue']
-        # bar = plt.bar(x1, Y1, color=C1)
-        # plt.xticks(x1, X1)
+        fig2, ax1 = plt.subplots()
+        plt.title('Interaction Force')
+        plt.grid(True)
+        ax1.set_ylabel('moment[Nm]', color = 'red')
+        ax1.set_ylim([-maximum_M, maximum_M])
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('force[N]', color = 'blue')
+        ax2.set_ylim([-maximum_F, maximum_F])
+        x1 = np.arange(4)
+        X1 = ['Mu', 'Fu', 'Mf', 'Ff']
+        Y1 = [Mu, Fu, Mf, Ff]
+        C1 = ['red', 'blue', 'red', 'blue']
+        bar = plt.bar(x1, Y1, color=C1)
+        plt.xticks(x1, X1)
 
-        # for rect in bar:
-        #     height = rect.get_height()
-        #     if height > 0:
-        #         plt.text(rect.get_x() + rect.get_width()/2.0, height, '%.4f' % height, ha='center', va='bottom')
-        #     else:
-        #         plt.text(rect.get_x() + rect.get_width()/2.0, height, '%.4f' % height, ha='center', va='top')
-        # plt.savefig(force)
-        # plt.close()
+        for rect in bar:
+            height = rect.get_height()
+            if height > 0:
+                plt.text(rect.get_x() + rect.get_width()/2.0, height, '%.4f' % height, ha='center', va='bottom')
+            else:
+                plt.text(rect.get_x() + rect.get_width()/2.0, height, '%.4f' % height, ha='center', va='top')
+        plt.savefig(force)
+        plt.close()
 
 
-        # # figure 3
+        # figure 3
 
-        # df = pd.DataFrame({
-        # 'Safety': ['0'],
-        # 'SMu': [SMu],
-        # 'SFu': [SFu],
-        # 'SMf': [SMf],
-        # 'SFf': [SFf],
-        # 'SA': [SA]
-        # })
+        df = pd.DataFrame({
+        'Safety': ['0'],
+        'SMu': [SMu],
+        'SFu': [SFu],
+        'SMf': [SMf],
+        'SFf': [SFf],
+        'SA': [SA]
+        })
 
-        # labels = df.columns[1:]
-        # num_labels = len(labels)
+        labels = df.columns[1:]
+        num_labels = len(labels)
             
-        # angles = [x/float(num_labels)*(2*pi) for x in range(num_labels)] ## 각 등분점
-        # angles += angles[:1] ## 시작점으로 다시 돌아와야하므로 시작점 추가
+        angles = [x/float(num_labels)*(2*pi) for x in range(num_labels)] ## 각 등분점
+        angles += angles[:1] ## 시작점으로 다시 돌아와야하므로 시작점 추가
             
-        # my_palette = plt.matplotlib.colormaps.get_cmap("Set2")
+        my_palette = plt.matplotlib.colormaps.get_cmap("Set2")
 
-        # txtscore = 'total safety score : ' + str(round(2,4))
+        txtscore = 'total safety score : ' + str(round(2,4))
 
-        # fig = plt.figure()
-        # fig.set_facecolor('white')
-        # ax = fig.add_subplot(polar=True)
-        # for i, row in df.iterrows():
-        #     color = my_palette(i)
-        #     data = df.iloc[i].drop('Safety').tolist()
-        #     data += data[:1]
+        fig = plt.figure()
+        fig.set_facecolor('white')
+        ax = fig.add_subplot(polar=True)
+        for i, row in df.iterrows():
+            color = my_palette(i)
+            data = df.iloc[i].drop('Safety').tolist()
+            data += data[:1]
             
-        #     ax.set_theta_offset(pi / 2) ## 시작점
-        #     ax.set_theta_direction(-1) ## 그려지는 방향 시계방향
+            ax.set_theta_offset(pi / 2) ## 시작점
+            ax.set_theta_direction(-1) ## 그려지는 방향 시계방향
             
-        #     plt.xticks(angles[:-1], labels) ## 각도 축 눈금 라벨
-        #     ax.tick_params(axis='x', which='major') ## 각 축과 눈금 사이에 여백을 준다.
+            plt.xticks(angles[:-1], labels) ## 각도 축 눈금 라벨
+            ax.tick_params(axis='x', which='major') ## 각 축과 눈금 사이에 여백을 준다.
 
-        #     ax.set_rlabel_position(0) ## 반지름 축 눈금 라벨 각도 설정(degree 단위)
-        #     plt.yticks([0.0,0.2,0.4,0.6,0.8,1.0],['0.0','0.2','0.4','0.6','0.8','1.0']) ## 반지름 축 눈금 설정
-        #     plt.ylim(0,1.0)
+            ax.set_rlabel_position(0) ## 반지름 축 눈금 라벨 각도 설정(degree 단위)
+            plt.yticks([0.0,0.2,0.4,0.6,0.8,1.0],['0.0','0.2','0.4','0.6','0.8','1.0']) ## 반지름 축 눈금 설정
+            plt.ylim(0,1.0)
             
-        #     ax.plot(angles, data, color=color, linewidth=2, linestyle='solid', label=row.Safety) ## 레이더 차트 출력
-        #     ax.fill(angles, data, color=color, alpha=0.4) ## 도형 안쪽에 색을 채워준다.
-        # plt.title('Safety Score')
-        # txtscore = 'total safety score : ' + str(round(Stotal,4))
-        # plt.suptitle(txtscore, y=0.05, fontsize = 10)  
-        # plt.savefig(score)
-        # plt.close()
+            ax.plot(angles, data, color=color, linewidth=2, linestyle='solid', label=row.Safety) ## 레이더 차트 출력
+            ax.fill(angles, data, color=color, alpha=0.4) ## 도형 안쪽에 색을 채워준다.
+        plt.title('Safety Score')
+        txtscore = 'total safety score : ' + str(round(Stotal,4))
+        plt.suptitle(txtscore, y=0.05, fontsize = 10)  
+        plt.savefig(score)
+        plt.close()
 
         # Print progress
         if m == 1:
