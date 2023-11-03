@@ -21,6 +21,7 @@ current_folder = os.getcwd()
 
 input_df = pd.read_csv('input.csv')
 input_angle = np.round(input_df['Angle'])
+input_angle[(input_angle > 179)] = 179
 input_time  = np.round(input_df['Timer'],4)
 input_length = len(input_angle)
 

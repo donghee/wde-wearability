@@ -12,8 +12,10 @@ from matplotlib.transforms import Affine2D
 
 input_df = pd.read_csv('input.csv')
 input_angle = np.round(input_df['Angle'])
-input_timer = input_df['Timer']
+input_angle[(input_angle > 179)] = 179
+input_time = input_df['Timer']
 input_length = len(input_angle)
+
 
 # constant value 73kg, 1741mm, male
 
