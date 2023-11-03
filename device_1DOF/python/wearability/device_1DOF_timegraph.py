@@ -179,8 +179,8 @@ def timegraph(case, line):
     plt.yticks(np.arange(-0.4, 0.4, 0.1))
     plt.ylim([-0.4, 0.4])
     plt.plot([0, x_d_f], [0, y_d_f], color='black', linewidth=1)
-    plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
     plt.plot([x, x_h_f], [y, y_h_f], color='green', linewidth=1)
+    plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
     plt.plot([x, x_h_u], [y, y_h_u], color='green', linewidth=1)
     plt.plot(x, y, 'g.', markersize=15)
     plt.plot(x_d_f, y_d_f, 'g.', markersize=15)
@@ -188,6 +188,7 @@ def timegraph(case, line):
     plt.plot(0, 0, 'k.', markersize=15)
     plt.text(-0.49,-0.34,txt1)
     plt.text(-0.49,-0.39,txt2)
+    plt.legend(('device','human'))
 
     # figure 2
 
@@ -257,6 +258,7 @@ def timegraph(case, line):
     plt.title('Safety Score')
     txtscore = 'total safety score : ' + str(round(Stotal,4))
     plt.suptitle(txtscore, y=0.05, fontsize = 10)  
+
 
     plt.show()
 

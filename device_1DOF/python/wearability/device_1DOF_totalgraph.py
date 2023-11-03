@@ -207,6 +207,7 @@ def G():
     plt.text(0.1,0.31,txtwc, color='red')
 
     plt.savefig(current_folder + '/total_safety.jpg')
+    plt.legend(('case0','case1','case2','case3','case4'),loc='lower right')
 
     plt.show()
 
