@@ -15,11 +15,11 @@ from scipy.io import loadmat
 
 # Clear console, variables, and close all plots (clc, clear, close all)
 import sys
-from IPython import get_ipython
+from io import BytesIO
 
-current_folder = os.getcwd()
+CSV_PATH = os.path.dirname(os.path.realpath(__file__))
 
-input_df = pd.read_csv('input.csv')
+input_df = pd.read_csv(CSV_PATH +'/input.csv')
 input_angle = np.round(input_df['Angle'])
 input_angle[(input_angle > 179)] = 179
 input_time  = np.round(input_df['Timer'],4)
@@ -40,11 +40,11 @@ def case(m):
     # Open and write to the 'score.txt' file
     ID= open(sc,"w+")
     a = 0
-        
+
     # Read data from the 'case?.txt' file
-    file = open(ca,"r")
+    file = open(CSV_PATH +'/' + ca,"r")
     G = np.loadtxt(file)
-        
+
     for n in input_angle:
 
         device_baselink_angle = 90
@@ -144,11 +144,11 @@ def case(m):
     ID.close()
 
 def G():
-    G0 = np.loadtxt(current_folder + '/score0.txt')
-    G1 = np.loadtxt(current_folder + '/score1.txt')
-    G2 = np.loadtxt(current_folder + '/score2.txt')
-    G3 = np.loadtxt(current_folder + '/score3.txt')
-    G4 = np.loadtxt(current_folder + '/score4.txt')
+    G0 = np.loadtxt(CSV_PATH + '/score0.txt')
+    G1 = np.loadtxt(CSV_PATH + '/score1.txt')
+    G2 = np.loadtxt(CSV_PATH + '/score2.txt')
+    G3 = np.loadtxt(CSV_PATH + '/score3.txt')
+    G4 = np.loadtxt(CSV_PATH + '/score4.txt')
 
     All = [G0, G1, G2, G3, G4]
 
@@ -171,7 +171,7 @@ def G():
         'Score': All[minimum_value]
     }
     df = pd.DataFrame(data)
-    df.to_csv(current_folder + '/output_expression.csv', index=False)
+    df.to_csv(CSV_PATH + '/output_expression.csv', index=False)
 
     # fig4 text
 
@@ -205,15 +205,21 @@ def G():
     plt.text(0.1,0.06,txtc4)
     plt.text(0.1,0.01,txtto, weight='bold')
     plt.text(0.1,0.31,txtwc, color='red')
-
-    plt.savefig(current_folder + '/total_safety.jpg')
+    
     plt.legend(('case0','case1','case2','case3','case4'),loc='lower right')
+    # plt.savefig(CSV_PATH + '/total_safety.jpg')    
+    # plt.show()
 
-    plt.show()
+    totalgraph_img = BytesIO()
+    plt.savefig(totalgraph_img, format='png', dpi=72)
+    plt.clf()
+    totalgraph_img.seek(0)
+
+    return totalgraph_img
 
 def totalgraph():
     for m in range(1,6):
         case(m)
-    G()
+    return G()
 
-totalgraph()
+# totalgraph()

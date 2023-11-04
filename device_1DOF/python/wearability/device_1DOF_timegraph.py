@@ -8,14 +8,12 @@ from matplotlib.path import Path
 from matplotlib.spines import Spine
 from matplotlib.transforms import Affine2D
 
+import os
+from io import BytesIO
+from PIL import Image
+
 # INPUT
-
-input_df = pd.read_csv('input.csv')
-input_angle = np.round(input_df['Angle'])
-input_angle[(input_angle > 179)] = 179
-input_time = input_df['Timer']
-input_length = len(input_angle)
-
+CSV_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # constant value 73kg, 1741mm, male
 
@@ -48,11 +46,25 @@ l_s_f_0 = L_h_f - L_d_f  # initial value of human forearm srping[m]
 
 device_baselink_angle = 90 # 
 
+def input_length():
+    input_df = pd.read_csv(CSV_PATH +'/input.csv')
+    input_angle = np.round(input_df['Angle'])
+    input_angle[(input_angle > 179)] = 179
+    input_length = len(input_angle)
+    return input_length
+
 def timegraph(case, line):
+    # read input.csv
+    input_df = pd.read_csv(CSV_PATH +'/input.csv')
+    input_angle = np.round(input_df['Angle'])
+    input_angle[(input_angle > 179)] = 179
+    input_time = input_df['Timer']
+    input_length = len(input_angle)
+
     device_elbow_angle = input_angle[line]    
 
     case_file = f'case{case}.txt'
-    file = open(case_file,"r")
+    file = open(CSV_PATH +'/' + case_file,"r")
 
     G = np.loadtxt(file)
 
@@ -151,7 +163,6 @@ def timegraph(case, line):
     print('-Total                : ',str(round(Stotal,4)))
 
     # figure 1
-
     x = (L_d_f*cos(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*cos(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*cos(baselink_angle))/sin(q_f - d_d + q_u)
     y = (L_d_f*sin(baselink_angle + q_u)*sin(q_f) + L_d_u*sin(d_d - q_f)*sin(baselink_angle + q_u) + L_d_u*sin(q_f - d_d + q_u)*sin(baselink_angle))/sin(q_f - d_d + q_u)
 
@@ -190,8 +201,13 @@ def timegraph(case, line):
     plt.text(-0.49,-0.39,txt2)
     plt.legend(('device','human'))
 
-    # figure 2
+    figure1_img = BytesIO()
+    plt.savefig(figure1_img, format='png', dpi=72)
+    plt.clf()
+    figure1_img.seek(0)
 
+    
+    # figure 2
     fig, ax1 = plt.subplots()
     plt.title('Interaction Force')
     plt.grid(True)
@@ -214,8 +230,12 @@ def timegraph(case, line):
         else:
             plt.text(rect.get_x() + rect.get_width()/2.0, height, '%.4f' % height, ha='center', va='top')
 
-    # figure 3
+    figure2_img = BytesIO()
+    plt.savefig(figure2_img, format='png', dpi=72)
+    plt.clf()
+    figure2_img.seek(0)
 
+    # figure 3
     df = pd.DataFrame({
     'Safety': ['0'],
     'SMu': [SMu],
@@ -259,9 +279,24 @@ def timegraph(case, line):
     txtscore = 'total safety score : ' + str(round(Stotal,4))
     plt.suptitle(txtscore, y=0.05, fontsize = 10)  
 
+    #plt.show()
 
-    plt.show()
+    figure3_img = BytesIO()
+    plt.savefig(figure3_img, format='png', dpi=72)
+    plt.clf()
+    figure3_img.seek(0)
+
+    # timegraph
+    timegraph_img = Image.new("RGB", (1300, 345))
+    timegraph_img.paste(Image.open(figure3_img), (900, 0))
+    timegraph_img.paste(Image.open(figure2_img), (450, 0))
+    timegraph_img.paste(Image.open(figure1_img), (000, 0))
+
+    timegraph_img_bytes = BytesIO()
+    timegraph_img.save(timegraph_img_bytes, format='png')
+    timegraph_img_bytes.seek(0)
+
+    return timegraph_img_bytes
 
 # 1. case 2. line
-timegraph(3,4)
-
+#timegraph(3,4)
