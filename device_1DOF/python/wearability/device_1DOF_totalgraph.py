@@ -21,6 +21,7 @@ CSV_PATH = os.path.dirname(os.path.realpath(__file__))
 
 input_df = pd.read_csv(CSV_PATH +'/input.csv')
 input_angle = np.round(input_df['Angle'])
+input_angle[(input_angle > 179)] = 179
 input_time  = np.round(input_df['Timer'],4)
 input_length = len(input_angle)
 
@@ -204,8 +205,9 @@ def G():
     plt.text(0.1,0.06,txtc4)
     plt.text(0.1,0.01,txtto, weight='bold')
     plt.text(0.1,0.31,txtwc, color='red')
-
-    # plt.savefig(CSV_PATH + '/total_safety.jpg')
+    
+    plt.legend(('case0','case1','case2','case3','case4'),loc='lower right')
+    # plt.savefig(CSV_PATH + '/total_safety.jpg')    
     # plt.show()
 
     totalgraph_img = BytesIO()

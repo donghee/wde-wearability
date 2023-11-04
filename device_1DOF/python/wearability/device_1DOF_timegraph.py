@@ -49,6 +49,7 @@ device_baselink_angle = 90 #
 def input_length():
     input_df = pd.read_csv(CSV_PATH +'/input.csv')
     input_angle = np.round(input_df['Angle'])
+    input_angle[(input_angle > 179)] = 179
     input_length = len(input_angle)
     return input_length
 
@@ -56,7 +57,8 @@ def timegraph(case, line):
     # read input.csv
     input_df = pd.read_csv(CSV_PATH +'/input.csv')
     input_angle = np.round(input_df['Angle'])
-    input_timer = input_df['Timer']
+    input_angle[(input_angle > 179)] = 179
+    input_time = input_df['Timer']
     input_length = len(input_angle)
 
     device_elbow_angle = input_angle[line]    
@@ -188,8 +190,8 @@ def timegraph(case, line):
     plt.yticks(np.arange(-0.4, 0.4, 0.1))
     plt.ylim([-0.4, 0.4])
     plt.plot([0, x_d_f], [0, y_d_f], color='black', linewidth=1)
-    plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
     plt.plot([x, x_h_f], [y, y_h_f], color='green', linewidth=1)
+    plt.plot([0, x_d_u], [0, y_d_u], color='black', linewidth=1)
     plt.plot([x, x_h_u], [y, y_h_u], color='green', linewidth=1)
     plt.plot(x, y, 'g.', markersize=15)
     plt.plot(x_d_f, y_d_f, 'g.', markersize=15)
@@ -197,6 +199,7 @@ def timegraph(case, line):
     plt.plot(0, 0, 'k.', markersize=15)
     plt.text(-0.49,-0.34,txt1)
     plt.text(-0.49,-0.39,txt2)
+    plt.legend(('device','human'))
 
     figure1_img = BytesIO()
     plt.savefig(figure1_img, format='png', dpi=72)
