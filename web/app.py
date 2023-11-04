@@ -1,43 +1,49 @@
-from flask import Flask, render_template, send_file
-import random
-
+from flask import Flask, render_template, send_file, request
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-#from simulation_modify_2 import safety_fig
-from one_dof.python.one_dof_graph import safety, safety_fig, safety_fig2
+from device_1DOF.python.wearability.device_1DOF_timegraph import timegraph, input_length
+from device_1DOF.python.wearability.device_1DOF_totalgraph import totalgraph
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    device = 'upper' if request.args.get('device') == None else request.args.get('device')
+    body = 'body1' if request.args.get('body') == None else request.args.get('body')
+    joint = 'joint1' if request.args.get('joint') == None else request.args.get('joint')
+    url = f'/?device={device}&body={body}&joint={joint}'
+    max_slide_size = input_length()
+    return render_template('index.html', url=url, max_slide_size=max_slide_size)
 
-@app.route('/wearability')
-def wearability():
-    return f'<h4>{random.randint(80, 100)}</h4>'
-
-@app.route('/fig/safety')
-def safety_img():
-    #img = safety_fig(baselink_angle=0, device_angle=175)
-    img = safety_fig(device_baselink_angle=0, device_elbow_angle=120)
+@app.route('/fig/timegraph/<wear_case>/<line>')
+def get_timegraph(wear_case, line):
+    _wear_case = int(wear_case)    
+    _line = int(line)
+    img = timegraph(_wear_case, _line)
     return send_file(img, mimetype='image/png')
 
-@app.route('/fig2/safety')
-def safety_img2():
-    import time
-    time.sleep(1)
-    #img = safety_fig(baselink_angle=0, device_angle=175)
-    img = safety_fig2(device_baselink_angle=0, device_elbow_angle=120)
+@app.route('/fig/update/timegraph', methods=['POST'])
+def update_timegraph():
+    if request.method == "POST":
+        print(request.form)
+        timegraph_line = request.form['v']
+        wear_case = request.form['case']        
+        return f"""
+        <div class="flex justify-center py-12" id="range_value" hx-swap-oob="true" hx-swap="outerHTML">
+        <img id="update-spinner" class="htmx-indicator" src="https://htmx.org/img/bars.svg"/ width=200>
+        <img id="wearability-result-fig" src="fig/timegraph/{wear_case}/{timegraph_line}"/>
+        </div>
+        """
+
+@app.route('/fig/totalgraph', methods=['GET'])
+def get_totalgraph():
+    img = totalgraph()
     return send_file(img, mimetype='image/png')
 
-
-@app.route('/safety')
-def safety_txt():
-    #result = safety(baselink_angle=0, device_angle=175)
-    result = safety(device_baselink_angle=0, device_elbow_angle=120)
-    #return f'<h4>{result[0]}, {result[1]}, {result[2]}, {result[3]}, {result[4]}</h4>'
-    return f'<h4>{result}</h4>'
-
+@app.route('/score/safety', methods=['GET'])
+def get_safety_score():
+   return ''
 
 if __name__ == '__main__':
-      app.run(host='0.0.0.0', port=5052)
+      app.run(host='0.0.0.0', port=5052, debug=True)
