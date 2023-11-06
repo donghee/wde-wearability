@@ -181,7 +181,7 @@ def G():
     txtc3 = 'safety score case3: ' + str(round(total_score_case3,4))
     txtc4 = 'safety score case4: ' + str(round(total_score_case4,4))
     txtto = 'total safety score : ' + str(round(total_score,4))
-    txtwc = 'worst case : ' + str(minimum_value - 1)
+    txtwc = 'worst case : ' + str(minimum_value)
 
     # figure 4
     fig4 = plt.figure()
