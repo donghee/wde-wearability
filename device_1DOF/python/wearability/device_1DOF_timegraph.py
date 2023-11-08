@@ -41,8 +41,9 @@ q_f_0 = 0 # initial value of human forearm deg[deg]
 
 g = 9.81 # gravitational acceleration[m/s^2]
 
-l_s_u_0 = L_h_u - L_d_u  # initial value of human upper arm spring[m] 
-l_s_f_0 = L_h_f - L_d_f  # initial value of human forearm srping[m]
+# offset
+offset_value = 0.01
+offset_matrix = np.array([[0, 0], [+offset_value, +offset_value], [+offset_value, -offset_value], [-offset_value, +offset_value], [-offset_value, -offset_value]])
 
 device_baselink_angle = 90 # 
 
@@ -54,6 +55,11 @@ def input_length():
     return input_length
 
 def timegraph(case, line):
+    offset = offset_matrix[case, :]
+    l_s_f_offset = offset[0]
+    l_s_u_offset = offset[1]
+    l_s_u_0 = L_h_u - L_d_u + l_s_u_offset  # initial value of human upper arm spring[m] 
+    l_s_f_0 = L_h_f - L_d_f + l_s_f_offset  # initial value of human forearm srping[m] 
     # read input.csv
     input_df = pd.read_csv(CSV_PATH +'/input.csv')
     input_angle = np.round(input_df['Angle'])
@@ -279,7 +285,7 @@ def timegraph(case, line):
     txtscore = 'total safety score : ' + str(round(Stotal,4))
     plt.suptitle(txtscore, y=0.05, fontsize = 10)  
 
-    #plt.show()
+    # plt.show()
 
     figure3_img = BytesIO()
     plt.savefig(figure3_img, format='png', dpi=72)
@@ -299,4 +305,4 @@ def timegraph(case, line):
     return timegraph_img_bytes
 
 # 1. case 2. line
-#timegraph(3,4)
+# timegraph(3,4)

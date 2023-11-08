@@ -31,7 +31,38 @@ end_input_time = max(input_time)
 duration_time = end_input_time - start_input_time
 duration_matrix = input_time  - start_input_time
 
+# offset
+offset_value = 0.01
+offset_matrix = np.array([[0, 0], [+offset_value, +offset_value], [+offset_value, -offset_value], [-offset_value, +offset_value], [-offset_value, -offset_value]])
+
+
 def case(m):
+    
+    # constant value 73kg, 1741mm, male
+
+    L_h_u = 0.2817 # human upper arm length[m]
+    L_h_f = 0.2689 # human forearm length[m]
+    L_d_u = 0.2 # device upper arm length[m]
+    L_d_f = 0.2 # device forarm length[m]
+
+    m_h_u = 1.9783 # human upper arm weight[kg]
+    m_h_f = 1.1826 # human forearm weight[kg]
+    m_d_u = 2 # device upper arm weight[kg]
+    m_d_f = 2 # device forearm weight[kg]
+
+    G_h_u = 0.4228 # human upper arm gravity ratio
+    G_h_f = 0.4574 # human forearm gravity ratio
+    G_d_u = 0.5 # robot upper arm gravity ratio
+    G_d_f = 0.5 # robot forearm gravity ratio
+
+    K_u = 10000 # human upper arm shear stiffness[N/m]
+    K_f = 10000 # human forearm shear stiffness[N/m]
+    K_t_u = 10000 # human upper arm torsion stiffness[N/m]
+    K_t_f = 10000 # human forearm torsion stiffness[N/m]
+    q_u_0 = 0 # initial value of human upper arm deg[deg]
+    q_f_0 = 0 # initial value of human forearm deg[deg]
+
+    g = 9.81 # gravitational acceleration[m/s^2]
 
     # Generate file paths
     ca = f'case{m - 1}.txt'
@@ -45,39 +76,18 @@ def case(m):
     file = open(CSV_PATH +'/' + ca,"r")
     G = np.loadtxt(file)
 
+    # offset
+    offset = offset_matrix[m - 1, :]
+    l_s_f_offset = offset[0]
+    l_s_u_offset = offset[1]
+    l_s_u_0 = L_h_u - L_d_u + l_s_u_offset  # initial value of human upper arm spring[m] 
+    l_s_f_0 = L_h_f - L_d_f + l_s_f_offset  # initial value of human forearm srping[m] 
+
+
     for n in input_angle:
 
         device_baselink_angle = 90
         device_elbow_angle = n
-
-        # constant value 73kg, 1741mm, male
-
-        L_h_u = 0.2817 # human upper arm length[m]
-        L_h_f = 0.2689 # human forearm length[m]
-        L_d_u = 0.2 # device upper arm length[m]
-        L_d_f = 0.2 # device forarm length[m]
-
-        m_h_u = 1.9783 # human upper arm weight[kg]
-        m_h_f = 1.1826 # human forearm weight[kg]
-        m_d_u = 2 # device upper arm weight[kg]
-        m_d_f = 2 # device forearm weight[kg]
-
-        G_h_u = 0.4228 # human upper arm gravity ratio
-        G_h_f = 0.4574 # human forearm gravity ratio
-        G_d_u = 0.5 # robot upper arm gravity ratio
-        G_d_f = 0.5 # robot forearm gravity ratio
-
-        K_u = 10000 # human upper arm shear stiffness[N/m]
-        K_f = 10000 # human forearm shear stiffness[N/m]
-        K_t_u = 10000 # human upper arm torsion stiffness[N/m]
-        K_t_f = 10000 # human forearm torsion stiffness[N/m]
-        q_u_0 = 0 # initial value of human upper arm deg[deg]
-        q_f_0 = 0 # initial value of human forearm deg[deg]
-
-        g = 9.81 # gravitational acceleration[m/s^2]
-
-        l_s_u_0 = L_h_u - L_d_u  # initial value of human upper arm spring[m] 
-        l_s_f_0 = L_h_f - L_d_f  # initial value of human forearm srping[m]
 
         q_u = radians(G[np.where((G[:, 0] == device_baselink_angle) & (G[:, 1] == device_elbow_angle))[0][0], 3])
         q_f = radians(G[np.where((G[:, 0] == device_baselink_angle) & (G[:, 1] == device_elbow_angle))[0][0], 4])
@@ -90,7 +100,6 @@ def case(m):
         h_d = d_d - q_u - q_f
 
         baselink_angle = radians(device_baselink_angle)
-
 
         # calculate safety socre
 
