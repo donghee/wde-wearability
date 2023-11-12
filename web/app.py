@@ -1,9 +1,10 @@
 from flask import Flask, render_template, send_file, request
-import sys, os
+import sys
+import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from device_1DOF.python.wearability.device_1DOF_timegraph import timegraph, input_length
-from device_1DOF.python.wearability.device_1DOF_totalgraph import totalgraph
+from device_1DOF.python.wearability.device_1DOF_totalgraph import totalgraph, totalscore
 
 app = Flask(__name__)
 
@@ -14,11 +15,20 @@ def index():
     joint = 'joint1' if request.args.get('joint') == None else request.args.get('joint')
     url = f'/?device={device}&body={body}&joint={joint}'
     max_slide_size = input_length()
-    return render_template('index.html', url=url, max_slide_size=max_slide_size)
+    subject = 'wearability'
+    return render_template('index.html', url=url, subject=subject, max_slide_size=max_slide_size)
+
+@app.route('/score')
+def score():
+    device = 'upper' if request.args.get('device') == None else request.args.get('device')
+    body = 'body1' if request.args.get('body') == None else request.args.get('body')
+    joint = 'joint1' if request.args.get('joint') == None else request.args.get('joint')
+    wearability = totalscore()
+    return f'{wearability}'
 
 @app.route('/fig/timegraph/<wear_case>/<line>')
 def get_timegraph(wear_case, line):
-    _wear_case = int(wear_case)    
+    _wear_case = int(wear_case)
     _line = int(line)
     img = timegraph(_wear_case, _line)
     return send_file(img, mimetype='image/png')
@@ -28,7 +38,7 @@ def update_timegraph():
     if request.method == "POST":
         print(request.form)
         timegraph_line = request.form['v']
-        wear_case = request.form['case']        
+        wear_case = request.form['case']
         return f"""
         <div class="flex justify-center py-12" id="range_value" hx-swap-oob="true" hx-swap="outerHTML">
         <img id="update-spinner" class="htmx-indicator" src="https://htmx.org/img/bars.svg"/ width=200>
@@ -40,10 +50,6 @@ def update_timegraph():
 def get_totalgraph():
     img = totalgraph()
     return send_file(img, mimetype='image/png')
-
-@app.route('/score/safety', methods=['GET'])
-def get_safety_score():
-   return ''
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=5052, debug=True)
