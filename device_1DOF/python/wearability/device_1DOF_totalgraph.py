@@ -231,4 +231,39 @@ def totalgraph():
         case(m)
     return G()
 
+def totalscore():
+    for m in range(1,6):
+        case(m)
+
+    G0 = np.loadtxt(CSV_PATH + '/score0.txt')
+    G1 = np.loadtxt(CSV_PATH + '/score1.txt')
+    G2 = np.loadtxt(CSV_PATH + '/score2.txt')
+    G3 = np.loadtxt(CSV_PATH + '/score3.txt')
+    G4 = np.loadtxt(CSV_PATH + '/score4.txt')
+
+    All = [G0, G1, G2, G3, G4]
+
+    # Calculate mean scores
+    total_score_case0 = np.mean(G0)
+    total_score_case1 = np.mean(G1)
+    total_score_case2 = np.mean(G2)
+    total_score_case3 = np.mean(G3)
+    total_score_case4 = np.mean(G4)
+
+    # Calculate the total score
+    total_scores = [total_score_case0, total_score_case1, total_score_case2, total_score_case3, total_score_case4]
+    total_score = np.mean(total_scores)
+    minimum_value = np.argmin(total_scores)
+
+    # Create a data table and save it to a CSV file
+    data = {
+        'Time': duration_matrix ,
+        'Angle': input_angle,
+        'Score': All[minimum_value]
+    }
+    df = pd.DataFrame(data)
+    df.to_csv(CSV_PATH + '/output_expression.csv', index=False)
+
+    return round(total_score,4)
+
 # totalgraph()
