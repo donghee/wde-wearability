@@ -96,9 +96,9 @@ def timegraph(case, line):
     AD = degrees(h_d) - degrees(d_d)
 
     maximum_Fu = 150
-    maximum_Mu = 100
+    maximum_Mu = 150
     maximum_Ff = 150
-    maximum_Mf = 100
+    maximum_Mf = 150
     maximum_AD = 5
 
     maximum_F = max([maximum_Fu, maximum_Ff])
