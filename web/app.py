@@ -11,19 +11,20 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     device = 'upper' if request.args.get('device') == None else request.args.get('device')
+    task = 'arm' if request.args.get('task') == None else request.args.get('task')    
     body = 'body1' if request.args.get('body') == None else request.args.get('body')
     joint = 'joint1' if request.args.get('joint') == None else request.args.get('joint')
     url = f'/?device={device}&body={body}&joint={joint}'
     max_slide_size = input_length()
     subject = 'wearability'
-    return render_template('index.html', url=url, subject=subject, max_slide_size=max_slide_size)
+    return render_template('index.html', url=url, subject=subject, body=body, device=device, task=task, max_slide_size=max_slide_size)
 
 @app.route('/score')
 def score():
     device = 'upper' if request.args.get('device') == None else request.args.get('device')
     body = 'body1' if request.args.get('body') == None else request.args.get('body')
     joint = 'joint1' if request.args.get('joint') == None else request.args.get('joint')
-    wearability = totalscore()
+    wearability = round(totalscore() * 100.0, 1)
     return f'{wearability}'
 
 @app.route('/fig/timegraph/<wear_case>/<line>')
