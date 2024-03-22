@@ -8,6 +8,9 @@ from matplotlib.path import Path
 from matplotlib.spines import Spine
 from matplotlib.transforms import Affine2D
 
+import matplotlib
+matplotlib.use('agg')
+
 import os
 from io import BytesIO
 from PIL import Image

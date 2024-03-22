@@ -13,6 +13,9 @@ from matplotlib.spines import Spine
 from matplotlib.transforms import Affine2D
 from scipy.io import loadmat
 
+import matplotlib
+matplotlib.use('agg')
+
 # Clear console, variables, and close all plots (clc, clear, close all)
 import sys
 from io import BytesIO
